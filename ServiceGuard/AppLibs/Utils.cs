@@ -8,6 +8,9 @@ namespace ServiceGuard.AppLibs {
         /// </summary>
         public static TimeZoneInfo TimeZoneInfo { get; } = TimeZoneInfo.FindSystemTimeZoneById("UTC");
         // TimeZoneInfo.ConvertTime(DateTime.UtcNow, tzinfo).ToString("yy-MM-dd HH:mm:ss.fff")
+
+        
+
     }
 
 }

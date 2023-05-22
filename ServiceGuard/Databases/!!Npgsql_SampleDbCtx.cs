@@ -3,11 +3,10 @@
 using Npgsql;
 using Microsoft.EntityFrameworkCore;
 using ServiceGuard.Commons;
-using ServiceGuard.Databases;
-using ServiceGuard.Sample.Models;
+using ServiceGuard.Models.Sample;
 
-// 注意: 此命名空間為：參考範本，禁止使用範本空間 ( 即：ServiceGuard.Sample 開頭的命名空間 )
-namespace ServiceGuard.Sample.Databases {
+// 注意: 此命名空間為：參考範本，禁止使用範本空間 ( 即：Sample 結尾的命名空間 )
+namespace ServiceGuard.Databases.Sample {
 
     // 構建
     /// <summary>

@@ -11,7 +11,7 @@ namespace ServiceGuard.Commons {
     /// </summary>
     /// <typeparam name="TRequestData">請求内容</typeparam>
     /// <typeparam name="TResponseData">響應内容</typeparam>
-    public abstract class WebApiTemplate<TRequestData, TResponseData> : Controller, IResult
+    public abstract partial class WebApiTemplate<TRequestData, TResponseData> : Controller, IResult
         where TRequestData : struct
         where TResponseData : struct {
 
@@ -103,22 +103,31 @@ namespace ServiceGuard.Commons {
         protected virtual bool CheckValidData(string parameter, string? path = null) {
             if (JObjRequestData == null) return false;
 
+            var parameters = parameter.Split(',');
+            if (parameters.Length == 1 && parameters[0].Length == 0) return true;  // 排除空檢查
+
+            string logStr = "\n";
+
             if(path == null) {
-                foreach (var item in parameter.Split(',')) {   // 以根路徑作爲主目錄
-                    Logger.LogInformation($"Parameter: {item}");
-                    if (JObjRequestData.SelectToken(item) == null) return false;
+                foreach (var item in parameters) {   // 以根路徑作爲主目錄
+                    var dataToken = JObjRequestData.SelectToken(item);
+                    if (dataToken == null) return Logger.LogInfoAndReturn(false, logStr + $"[PreCheck] Fail !! {item} *** Warning: Data cannot be Null\n");
+                    if (dataToken.ToString().Length == 0) return Logger.LogInfoAndReturn(false, logStr + $"[PreCheck] Fail !! {item} *** Warning: Length cannot be 0\n");
+                    logStr += $"[PreCheck] Pass >> {item}\n";
                 }
             }
             else {
                 var token = JObjRequestData.SelectToken(path); // 獲取指定路徑作爲主目錄
-                if (token == null) return false;
-                foreach (var item in parameter.Split(',')) {
-                    Logger.LogInformation($"Parameter Token: {item}");
-                    if (token.SelectToken(item) == null) return false;
+                if (token == null) return Logger.LogInfoAndReturn(false, logStr + $"[PreCheck](./{path}) Fail !! (./{path}) *** Warning: Data cannot be Null\n");
+                foreach (var item in parameters) {
+                    var dataToken = token.SelectToken(item);
+                    if (dataToken == null) return Logger.LogInfoAndReturn(false, logStr + $"[PreCheck](./{path}) Fail !! {item} *** Warning: Data cannot be Null\n");
+                    if (dataToken.ToString().Length == 0) return Logger.LogInfoAndReturn(false, logStr + $"[PreCheck](./{path}) Fail !! {item} *** Warning: Length cannot be 0\n");
+                    logStr += $"[PreCheck](./{path}) Pass >> {item}\n";
                 }
             }
 
-            return true;
+            return Logger.LogInfoAndReturn(true, logStr);
         }
         /// <summary>
         /// 跨域檢查

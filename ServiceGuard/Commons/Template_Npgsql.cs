@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ServiceGuard.AppLibs;
-using ServiceGuard.Commons;
 
-namespace ServiceGuard.Databases {
+namespace ServiceGuard.Commons {
 
     /// <summary>
     /// .Net PostgreSQL 資料庫上下文-模板
@@ -29,7 +28,7 @@ namespace ServiceGuard.Databases {
             // 兼容無資料庫
             if (connStr == "") {
                 Logger.LogInformation("No database connecting string.");
-                return; 
+                return;
             }
 
             // 使用 Npgsql 建立連綫

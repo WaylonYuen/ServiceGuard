@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 
 using ServiceGuard.Middlewares;
 using ServiceGuard.AppLibs;
+using ServiceGuard.Databases;
 
 // Main Program
 
@@ -49,7 +50,7 @@ builder.Services.AddCors(options => {
         .AllowAnyOrigin()       // 任何來源
         .AllowAnyHeader()       // 任何標頭
         .AllowAnyMethod()       // 任何方法
-        //.AllowCredentials()    // 允許携帶身份驗證信息 (JWT)
+        .AllowCredentials()    // 允許携帶身份驗證信息 (JWT)
         ;
     });
 });
@@ -91,10 +92,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 /************************************************
 * Database 資料庫
 */
-// PG-SQL
-builder.Services.AddEntityFrameworkNpgsql().AddDbContext<ServiceGuard.Sample.Databases.Npgsql_UserManagerDbCtx>();
-// MS-SQL
-// todo:
+builder.Services.AddNpgsql();   // Postgre-SQL
+//builder.Services.AddMSSQL();    // MS-SQL
 
 /************************************************
 * Others | Test

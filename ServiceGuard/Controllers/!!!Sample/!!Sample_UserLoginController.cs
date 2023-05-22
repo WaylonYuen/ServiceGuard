@@ -1,18 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Cors;
 using ServiceGuard.Commons;
-using ServiceGuard.Sample.Databases;
-using ServiceGuard.Sample.Models;
+using ServiceGuard.Databases.Sample;
+using ServiceGuard.Models.Sample;
 
-// 注意: 此命名空間為：參考範本，禁止使用範本空間 ( 即：ServiceGuard.Sample 開頭的命名空間 )
-namespace ServiceGuard.Sample.Controllers {
+// 注意: 此命名空間為：參考範本，禁止使用範本空間 ( 即：Sample 結尾的命名空間 )
+namespace ServiceGuard.Controllers.Sample {
 
     // For 請求  (前置檢查 & 響應)
     [ApiController]                 // 標記-此類作爲API
     [Route("api/[controller]")]     // 啓用-URL路由
     [EnableCors("CorsPolicy")]      // 啓用-跨域策略 (似情況開啓，請遵循安全策略)
-    public partial class SampleUserLoginController : WebApiTemplate
-        <SampleUserLoginController.RequestDataModel, SampleUserLoginController.ResponseDataModel> {
+    public partial class Sample_UserLoginController : WebApiTemplate
+        <Sample_UserLoginController.RequestDataModel, Sample_UserLoginController.ResponseDataModel> {
 
         /// <summary>
         /// API入口 ( 當收到請求時執行 )
@@ -61,15 +61,14 @@ namespace ServiceGuard.Sample.Controllers {
             }
 
             BuildResponse(); // 建立-響應(打包響應資訊)
-            Logger.LogInformation($"{ResponseData}\n");
             return ResponseData; // 回復請求結果
         }
 
     }
 
     // For 處理  (資料庫查詢 & 處理邏輯)
-    public partial class SampleUserLoginController : WebApiTemplate
-        <SampleUserLoginController.RequestDataModel, SampleUserLoginController.ResponseDataModel> {
+    public partial class Sample_UserLoginController : WebApiTemplate
+        <Sample_UserLoginController.RequestDataModel, Sample_UserLoginController.ResponseDataModel> {
 
         /// <summary>
         /// 用戶驗證
@@ -79,14 +78,13 @@ namespace ServiceGuard.Sample.Controllers {
             // 嘗試呼叫-資料庫
             try {
 
-                // 資料庫查詢時所需要的必要資料欄位
-                UserDataModel.Login.Linq linq = new() {
+                // 呼叫資料庫 & 綜合查詢成功
+                if(UserMgrDbCtx.Login(new UserDataModel.Login.Linq() {
                     Id = RequestData.Id,
                     Password = RequestData.Password,
-                };
 
-                // 呼叫資料庫 & 綜合查詢成功
-                if(UserMgrDbCtx.Login(linq, out UserDataModel.Login.Result? data) == true) {
+                }, out UserDataModel.Login.Result? data) == true) {
+
                     // 檢查：資料是否存在?
                     if (data != null) {
                         // 寫入-響應正文
@@ -94,11 +92,10 @@ namespace ServiceGuard.Sample.Controllers {
                         // More...
                         return true;
                     }
-                    else {
-                        Logger.LogInformation("Linq result data is null!");
-                        BuildResult(WebApiResult.Code.Fail, "No Data");
-                        return false;
-                    }
+
+                    Logger.LogInformation("Linq result data is null!");
+                    BuildResult(WebApiResult.Code.Fail, "No Data");
+                    return false;
                 }
 
                 // 查詢失敗，沒有相關 or 符合條件的資料
@@ -115,10 +112,9 @@ namespace ServiceGuard.Sample.Controllers {
 
 #if DEBUG
                 // 暴露例外訊息不安全
-                BuildResult(WebApiResult.Code.CheckFailed_ValidData);
+                BuildResult(WebApiResult.Code.Exception, ex.Message);
 #else
-                // undone
-                ResponseData = (ResponseDataModel)Result.BuildExceptionInfo(ResponseData);
+                BuildResult(WebApiResult.Code.Exception);
 #endif
                 return false;
             }
@@ -127,8 +123,8 @@ namespace ServiceGuard.Sample.Controllers {
     }
 
     // For 構建  (資料模型)
-    public partial class SampleUserLoginController : WebApiTemplate
-        <SampleUserLoginController.RequestDataModel, SampleUserLoginController.ResponseDataModel> {
+    public partial class Sample_UserLoginController : WebApiTemplate
+        <Sample_UserLoginController.RequestDataModel, Sample_UserLoginController.ResponseDataModel> {
 
         #region DataModel 資料模型
         public struct RequestDataModel {
@@ -167,7 +163,7 @@ namespace ServiceGuard.Sample.Controllers {
         /// Constructor 構建式
         /// </summary>
         /// <param name="logger">依賴注入: 日志</param>
-        public SampleUserLoginController(ILogger<SampleUserLoginController> logger, Npgsql_UserManagerDbCtx dbContext) {
+        public Sample_UserLoginController(ILogger<Sample_UserLoginController> logger, Npgsql_UserManagerDbCtx dbContext) {
             Logger = logger;
             UserMgrDbCtx = dbContext;
             Initialize(this);
@@ -179,7 +175,9 @@ namespace ServiceGuard.Sample.Controllers {
         protected override void BuildResponse() {
             ResponseData.ResultCode = result.ResultCode;
             ResponseData.ResultMsg = result.ResultMsg;
+            Logger.LogInformation($"{ResponseData}\n");
         }
 
     }
+
 }

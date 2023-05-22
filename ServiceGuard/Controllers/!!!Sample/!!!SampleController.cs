@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Cors;
 using ServiceGuard.Commons;
-using ServiceGuard.Sample.Databases;
+using ServiceGuard.Databases.Sample;
 
-// 注意: 此命名空間為：參考範本，禁止使用範本空間 ( 即：ServiceGuard.Sample 開頭的命名空間 )
-namespace ServiceGuard.Sample.Controllers {
+// 注意: 此命名空間為：參考範本，禁止使用範本空間 ( 即：Sample 結尾的命名空間 )
+namespace ServiceGuard.Controllers.Sample {
 
     // For 請求  (前置檢查 & 響應)
     [ApiController]                 // 標記-此類作爲API
@@ -124,6 +124,7 @@ namespace ServiceGuard.Sample.Controllers {
         protected override void BuildResponse() {
             ResponseData.ResultCode = result.ResultCode;
             ResponseData.ResultMsg = result.ResultMsg;
+            Logger.LogInformation($"{ResponseData}\n");
         }
 
     }

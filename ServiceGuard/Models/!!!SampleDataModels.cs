@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-// 注意: 此命名空間為：參考範本，禁止使用範本空間 ( 即：ServiceGuard.Sample 開頭的命名空間 )
-namespace ServiceGuard.Sample.Models {
+// 注意: 此命名空間為：參考範本，禁止使用範本空間 ( 即：Sample 結尾的命名空間 )
+namespace ServiceGuard.Models.Sample {
 
     /// <summary>
     /// 用戶資料模型
