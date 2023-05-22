@@ -58,34 +58,42 @@ builder.Services.AddCors(options => {
 /************************************************
 * JWT 身份驗證
 */
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme) // 使用 JWT Bearer 身份驗證方案
+// 配置 JWT Bearer
 .AddJwtBearer(options => {
     // 是否將詳細錯誤信息傳送給 Client (當驗證失敗時，回應標頭會包含 WWW-Authenticate 標頭，這裡會顯示失敗的詳細錯誤原因)
     options.IncludeErrorDetails = true;
-    options.TokenValidationParameters = new TokenValidationParameters {
+    options.TokenValidationParameters = new TokenValidationParameters { // JWT 令牌驗證的參數設定
 
         // 透過這項宣告，就可以從 "sub" 取值並設定給 User.Identity.Name
         NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
         // 透過這項宣告，就可以從 "roles" 取值，並可讓 [Authorize] 判斷角色
         RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
 
-        // JWT 發行者-是否驗證設定
-        ValidateIssuer = true,
-        ValidIssuer = "https://meowlien.com",
+        /*  ** 發行者 **
+        *   生成 JWT 的服務器的識別符。它通常是發行 JWT 的伺服器的網址或名稱
+        */
+        ValidateIssuer = true,                      // 是否驗證設定
+        ValidIssuer = "https://meowlien.com",       // 發行 JWT 的服務器網址或名稱
 
-        // JWT 受衆-是否驗證設定 (單一伺服器通常不太需要驗證)
-        ValidateAudience = false,
-        ValidAudience = "https://meowlien.com",
+        /*  ** 受衆 **
+        *   JWT 的預期接收和處理 JWT 的實體。可以是特定的使用者、應用程式或服務
+        */
+        ValidateAudience = false,                   // 是否驗證設定 >> 單一伺服器通常不太需要驗證
+        ValidAudience = "https://meowlien.com",     // JWT 的預期接收和處理 JWT 的實體 (例如：特定的使用者、應用程式或服務)
 
-        // JWT 有效期-是否驗證設定
-        ValidateLifetime = true,
-        // JWT 過期-是否驗證設定
-        RequireExpirationTime = false,
+        /*  ** 有效期 **
+        *   JWT 的有效期限。它表示 JWT 在何時過期，過期後將無法再被使用。在 JWT 的 exp（expiry）聲明中指定，使用 UTC 時間表示
+        */
+        ValidateLifetime = true,                    // 是否驗證有效期
+        RequireExpirationTime = false,              // JWT 過期-是否驗證設定
 
-        // JWT 加密鑰匙-是否驗證設定 (如果 Token 中包含 key 才需要驗證，一般都只有簽章而已)
-        ValidateIssuerSigningKey = false,
-        // JWT 加密鑰匙-設定
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("1234567890123456"))
+        /*  ** 密鑰 **
+        *   用於對 JWT 進行簽名和驗證的秘密金鑰。它必須是一個安全且機密的值，只有伺服器和授權方才能知道。 
+        */
+        ValidateIssuerSigningKey = false,           // 是否驗證密鑰 (如果 Token 中包含 key 才需要驗證，一般都只有簽章而已)
+        IssuerSigningKey =                          // JWT 加密鑰匙-設定
+        new SymmetricSecurityKey(Encoding.UTF8.GetBytes("1234567890123456"))
     };
 });
 
@@ -133,13 +141,6 @@ app.Use(async (context, next) => { // RequestBodyReader
 
     var request = context.Request;
 
-    /*// 獲取所有的 URL 參數
-    var urlParameters = context.Request.Query;
-    Console.WriteLine($"Test1: {context.Request.RouteValues.Count > 0}\n\n");
-    // 獲取所有的表單參數
-    var formParameters = await context.Request.ReadFormAsync();
-    Console.WriteLine($"Test2: {formParameters}\n\n");
-*/
     if (request.Method != HttpMethods.Post) {
         await next(context);
         return;

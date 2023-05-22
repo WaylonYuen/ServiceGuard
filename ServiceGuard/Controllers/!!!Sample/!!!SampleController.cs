@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using ServiceGuard.Commons;
 using ServiceGuard.Databases.Sample;
+using Microsoft.AspNetCore.Authorization;
 
 // 注意: 此命名空間為：參考範本，禁止使用範本空間 ( 即：Sample 結尾的命名空間 )
 namespace ServiceGuard.Controllers.Sample {
@@ -9,7 +10,8 @@ namespace ServiceGuard.Controllers.Sample {
     // For 請求  (前置檢查 & 響應)
     [ApiController]                 // 標記-此類作爲API
     [Route("api/[controller]")]     // 啓用-URL路由
-    [EnableCors("CorsPolicy")]      // 啓用-跨域策略 (似情況開啓，請遵循安全策略)
+    [EnableCors("CorsPolicy")]      // 啓用-跨域策略 (似情況來指定策略，請遵循安全策略)
+    //[Authorize]                     // 啓用-身份驗證 (驗證通過才能夠訪問此資源)
     public partial class SampleController : WebApiTemplate
         <SampleController.RequestDataModel, SampleController.ResponseDataModel> {
 
